@@ -17,7 +17,7 @@ class Pago extends Model {
                 throw new Exception("No hay comisiones para procesar");
             }
             
-            // Calcular total
+            // Calculate total commission amount
             $placeholders = str_repeat('?,', count($comisiones_ids) - 1) . '?';
             $sql = "SELECT SUM(monto) as total FROM comisiones WHERE id IN ($placeholders) AND estado = 'pendiente'";
             $result = $this->fetch($sql, $comisiones_ids);
@@ -27,18 +27,31 @@ class Pago extends Model {
                 throw new Exception("No hay comisiones pendientes para procesar");
             }
             
-            // Crear registro de pago
+            // Check if admin has sufficient balance
+            $userModel = new Usuario();
+            $admin_balance = $userModel->getAdminBalance();
+            
+            if ($admin_balance < $total) {
+                throw new Exception("Saldo insuficiente. Saldo disponible: $" . number_format($admin_balance, 2) . ", Monto requerido: $" . number_format($total, 2));
+            }
+            
+            // Deduct commission amount from administrator balance
+            if (!$userModel->deductFromAdminBalance($total)) {
+                throw new Exception("Error al descontar del saldo del administrador");
+            }
+            
+            // Create payment record
             $sql = "INSERT INTO pagos (barbero_id, total_pagado) VALUES (?, ?)";
             $this->execute($sql, [$barbero_id, $total]);
             $pago_id = $this->db->lastInsertId();
             
-            // Crear detalles del pago
+            // Create payment details
             foreach ($comisiones_ids as $comision_id) {
                 $sql = "INSERT INTO detalle_pagos (pago_id, comision_id) VALUES (?, ?)";
                 $this->execute($sql, [$pago_id, $comision_id]);
             }
             
-            // Marcar comisiones como pagadas
+            // Mark commissions as paid
             $comisionModel = new Comision();
             $comisionModel->marcarComoPagadas($comisiones_ids);
             

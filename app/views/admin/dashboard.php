@@ -34,6 +34,30 @@ include '../app/views/includes/navbar.php';
         <div class="col-md-10 p-4">
             <h2 class="mb-4">Dashboard Administrativo</h2>
             
+            <!-- Administrator Balance Alert -->
+            <div class="alert alert-<?= $admin_balance >= 0 ? 'success' : 'warning' ?> mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-wallet"></i> <strong>Saldo disponible:</strong> $<?= number_format($admin_balance, 2) ?>
+                        <small class="d-block mt-1">
+                            <?php if ($admin_balance >= 0): ?>
+                                Ingresos por servicios completados menos comisiones pagadas
+                            <?php else: ?>
+                                ⚠️ Saldo negativo - Se han pagado más comisiones que ingresos generados
+                            <?php endif; ?>
+                        </small>
+                    </div>
+                    <?php if ($admin_balance < $comisiones_pendientes): ?>
+                        <div class="text-end">
+                            <small class="text-muted">
+                                Comisiones pendientes: $<?= number_format($comisiones_pendientes, 2) ?><br>
+                                <span class="text-warning">⚠️ Saldo insuficiente para pagar todas las comisiones</span>
+                            </small>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
             <!-- Stats Cards -->
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -91,21 +115,39 @@ include '../app/views/includes/navbar.php';
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card bg-dark text-white shadow">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4>$<?= isset($saldo_admin) ? number_format($saldo_admin, 2) : '0.00' ?></h4>
-                                    <p class="mb-0">Saldo del Administrador</p>
-                                </div>
-                                <i class="fas fa-wallet fa-2x"></i>
+            </div>
+            
+            <!-- Financial Flow Explanation -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Flujo Financiero</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-plus-circle fa-2x text-success mb-2"></i>
+                                <h6>1. Servicio Completado</h6>
+                                <p class="small text-muted">El precio del servicio se agrega al saldo del administrador</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <h6>2. Comisión Generada</h6>
+                                <p class="small text-muted">Se crea una comisión pendiente para el barbero</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-minus-circle fa-2x text-danger mb-2"></i>
+                                <h6>3. Pago de Comisión</h6>
+                                <p class="small text-muted">El monto de la comisión se descuenta del saldo</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                </div>
+            </div>
             
             <!-- Recent Appointments -->
             <div class="card">

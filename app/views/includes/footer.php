@@ -15,7 +15,22 @@
                     setTimeout(() => alert.remove(), 500);
                 }
             });
-        }, 3000);
+        }, 5000);
+        
+        // Clear form when modal is hidden
+        document.addEventListener('DOMContentLoaded', function() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function() {
+                    const forms = this.querySelectorAll('form');
+                    forms.forEach(form => {
+                        if (!form.id || form.id !== 'deleteForm') {
+                            form.reset();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>

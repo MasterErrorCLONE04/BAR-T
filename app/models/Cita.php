@@ -51,37 +51,55 @@ class Cita extends Model {
         return $this->execute($sql, [$estado, $id]);
     }
     
+    /**
+     * Complete appointment: Add service price to admin balance and generate commission
+     * @param int $id Appointment ID
+     * @return bool
+     */
     public function completarCita($id) {
-    try {
-        $this->db->beginTransaction();
-        
-        // Actualizar estado de la cita
-        $this->updateEstado($id, 'realizada');
-        
-        // Obtener datos de la cita
-        $cita = $this->getCitaById($id);
-        
-        // Calcular comisión
-        $barbero = $this->fetch("SELECT comision FROM usuarios WHERE id = ?", [$cita['barbero_id']]);
-        $comision_monto = ($cita['servicio_precio'] * $barbero['comision']) / 100;
-
-        // Crear comisión
-        $sql = "INSERT INTO comisiones (cita_id, barbero_id, monto) VALUES (?, ?, ?)";
-        $this->execute($sql, [$id, $cita['barbero_id'], $comision_monto]);
-
-        // Sumar el precio del servicio al saldo del administrador
-        $sql = "UPDATE usuarios SET saldo = saldo + ? WHERE rol = 'admin'";
-        $this->execute($sql, [$cita['servicio_precio']]);
-
-        $this->db->commit();
-        return true;
-    } catch (Exception $e) {
-        $this->db->rollback();
-        error_log("Error al completar cita: " . $e->getMessage());
-        return false;
+        try {
+            $this->db->beginTransaction();
+            
+            // Get appointment details with service price and barber commission
+            $sql = "SELECT c.*, s.precio as servicio_precio, u.comision as barbero_comision
+                    FROM citas c
+                    JOIN servicios s ON c.servicio_id = s.id
+                    JOIN usuarios u ON c.barbero_id = u.id
+                    WHERE c.id = ? AND c.estado = 'confirmada'";
+            
+            $cita = $this->fetch($sql, [$id]);
+            
+            if (!$cita) {
+                throw new Exception("Cita no encontrada o no está confirmada");
+            }
+            
+            // Calculate commission amount
+            $comision_monto = ($cita['servicio_precio'] * $cita['barbero_comision']) / 100;
+            $service_price = $cita['servicio_precio'];
+            
+            // Update appointment status to completed
+            $sql = "UPDATE citas SET estado = 'realizada' WHERE id = ?";
+            $this->execute($sql, [$id]);
+            
+            // Add service price to administrator balance (income from completed service)
+            $userModel = new Usuario();
+            if (!$userModel->addToAdminBalance($service_price)) {
+                throw new Exception("Error al agregar ingreso al saldo del administrador");
+            }
+            
+            // Create commission record (pending payment)
+            $sql = "INSERT INTO comisiones (cita_id, barbero_id, monto) VALUES (?, ?, ?)";
+            $this->execute($sql, [$id, $cita['barbero_id'], $comision_monto]);
+            
+            $this->db->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log("Error en completarCita: " . $e->getMessage());
+            return false;
+        }
     }
-}
-
     
     public function getCitaById($id) {
         $sql = "SELECT c.*, s.precio as servicio_precio

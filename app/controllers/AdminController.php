@@ -6,22 +6,21 @@ class AdminController extends Controller {
     }
     
     public function dashboard() {
-    $citaModel = $this->model('Cita');
-    $userModel = $this->model('Usuario');
-    $comisionModel = $this->model('Comision');
-
-    $data = [
-        'total_citas' => $citaModel->getTotalCitas(),
-        'total_barberos' => $userModel->getTotalByRole('barbero'),
-        'total_clientes' => $userModel->getTotalByRole('cliente'),
-        'comisiones_pendientes' => $comisionModel->getTotalPendientes(),
-        'citas_recientes' => $citaModel->getRecientes(5),
-        'saldo_admin' => $userModel->getSaldoAdmin() // ✅ nuevo dato
-    ];
-
-    $this->view('admin/dashboard', $data);
-}
-
+        $citaModel = $this->model('Cita');
+        $userModel = $this->model('Usuario');
+        $comisionModel = $this->model('Comision');
+        
+        $data = [
+            'total_citas' => $citaModel->getTotalCitas(),
+            'total_barberos' => $userModel->getTotalByRole('barbero'),
+            'total_clientes' => $userModel->getTotalByRole('cliente'),
+            'comisiones_pendientes' => $comisionModel->getTotalPendientes(),
+            'citas_recientes' => $citaModel->getRecientes(5),
+            'admin_balance' => $userModel->getAdminBalance()
+        ];
+        
+        $this->view('admin/dashboard', $data);
+    }
     
     public function usuarios() {
         $userModel = $this->model('Usuario');
@@ -57,15 +56,43 @@ class AdminController extends Controller {
             $action = $_POST['action'] ?? '';
             
             if ($action === 'create') {
-                if ($servicioModel->create($_POST['nombre'], $_POST['descripcion'], $_POST['precio'])) {
+                $nombre = $_POST['nombre'] ?? '';
+                $descripcion = $_POST['descripcion'] ?? '';
+                $precio = $_POST['precio'] ?? 0;
+                
+                if ($servicioModel->create($nombre, $descripcion, $precio)) {
                     $data['success'] = 'Servicio creado exitosamente';
                 } else {
                     $data['error'] = 'Error al crear servicio';
                 }
             }
+            
+            elseif ($action === 'update') {
+                $id = $_POST['id'] ?? 0;
+                $nombre = $_POST['nombre'] ?? '';
+                $descripcion = $_POST['descripcion'] ?? '';
+                $precio = $_POST['precio'] ?? 0;
+                
+                if ($servicioModel->update($id, $nombre, $descripcion, $precio)) {
+                    $data['success'] = 'Servicio actualizado exitosamente';
+                } else {
+                    $data['error'] = 'Error al actualizar servicio';
+                }
+            }
+            
+            elseif ($action === 'delete') {
+                $id = $_POST['id'] ?? 0;
+                $result = $servicioModel->delete($id);
+                
+                if ($result['success']) {
+                    $data['success'] = $result['message'];
+                } else {
+                    $data['error'] = $result['message'];
+                }
+            }
         }
         
-        $data['servicios'] = $servicioModel->getAll();
+        $data['servicios'] = $servicioModel->getAllWithStats();
         $this->view('admin/servicios', $data ?? []);
     }
     
@@ -77,13 +104,20 @@ class AdminController extends Controller {
     
     public function comisiones() {
         $comisionModel = $this->model('Comision');
-        $data = ['comisiones' => $comisionModel->getAllWithDetails()];
+        $userModel = $this->model('Usuario');
+        
+        $data = [
+            'comisiones' => $comisionModel->getAllWithDetails(),
+            'admin_balance' => $userModel->getAdminBalance()
+        ];
+        
         $this->view('admin/comisiones', $data);
     }
     
     public function pagos() {
         $comisionModel = $this->model('Comision');
         $pagoModel = $this->model('Pago');
+        $userModel = $this->model('Usuario');
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $barbero_id = $_POST['barbero_id'] ?? '';
@@ -94,10 +128,14 @@ class AdminController extends Controller {
                 $result = $comisionModel->fetch($sql, [$barbero_id]);
                 
                 if ($result && !empty($result['comisiones_ids'])) {
-                    if ($pagoModel->procesarPago($barbero_id, $result['comisiones_ids'])) {
-                        $data['success'] = 'Pago procesado exitosamente';
-                    } else {
-                        $data['error'] = 'Error al procesar el pago';
+                    try {
+                        if ($pagoModel->procesarPago($barbero_id, $result['comisiones_ids'])) {
+                            $data['success'] = 'Pago procesado exitosamente. El monto ha sido descontado del saldo.';
+                        } else {
+                            $data['error'] = 'Error al procesar el pago. Verifique el log de errores.';
+                        }
+                    } catch (Exception $e) {
+                        $data['error'] = 'Error: ' . $e->getMessage();
                     }
                 } else {
                     $data['error'] = 'No hay comisiones pendientes para este barbero';
@@ -107,6 +145,7 @@ class AdminController extends Controller {
         
         $data['comisiones_pendientes'] = $comisionModel->getPendientesByBarbero();
         $data['pagos_realizados'] = $pagoModel->getAll();
+        $data['admin_balance'] = $userModel->getAdminBalance();
         
         $this->view('admin/pagos', $data ?? []);
     }

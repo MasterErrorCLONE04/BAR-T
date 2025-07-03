@@ -37,12 +37,44 @@ class Usuario extends Model {
         $sql = "SELECT * FROM usuarios WHERE id = ?";
         return $this->fetch($sql, [$id]);
     }
-
-    // ✅ NUEVO MÉTODO PARA OBTENER EL SALDO DEL ADMINISTRADOR
-    public function getSaldoAdmin() {
-        $sql = "SELECT saldo FROM usuarios WHERE rol = 'admin' LIMIT 1";
+    
+    /**
+     * Get the current balance of the administrator
+     * @return float
+     */
+    public function getAdminBalance() {
+        $sql = "SELECT saldo FROM usuarios WHERE rol = 'admin' AND activo = 1 LIMIT 1";
         $result = $this->fetch($sql);
-        return $result['saldo'] ?? 0;
+        return $result ? (float)$result['saldo'] : 0.00;
+    }
+    
+    /**
+     * Update administrator balance (deduct commission amount)
+     * @param float $amount Amount to deduct from balance
+     * @return bool
+     */
+    public function deductFromAdminBalance($amount) {
+        $sql = "UPDATE usuarios SET saldo = saldo - ? WHERE rol = 'admin' AND activo = 1";
+        return $this->execute($sql, [$amount]) > 0;
+    }
+    
+    /**
+     * Add amount to administrator balance
+     * @param float $amount Amount to add to balance
+     * @return bool
+     */
+    public function addToAdminBalance($amount) {
+        $sql = "UPDATE usuarios SET saldo = saldo + ? WHERE rol = 'admin' AND activo = 1";
+        return $this->execute($sql, [$amount]) > 0;
+    }
+    
+    /**
+     * Get administrator user data
+     * @return array|false
+     */
+    public function getAdmin() {
+        $sql = "SELECT * FROM usuarios WHERE rol = 'admin' AND activo = 1 LIMIT 1";
+        return $this->fetch($sql);
     }
 }
 ?>

@@ -8,7 +8,7 @@ $role_names = [
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"><i class="fas fa-cut"></i> Barbería Pro</a>
+        <a class="navbar-brand" href="#"><i class="fas fa-cut"></i> BAR-T</a>
         
         <div class="navbar-nav ms-auto">
             <div class="nav-item dropdown">
