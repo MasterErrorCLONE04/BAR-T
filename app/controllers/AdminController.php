@@ -23,31 +23,56 @@ class AdminController extends Controller {
     }
     
     public function usuarios() {
-        $userModel = $this->model('Usuario');
+    $userModel = $this->model('Usuario');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $action = $_POST['action'] ?? '';
         
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $action = $_POST['action'] ?? '';
-            
-            if ($action === 'create_barbero') {
-                $nombre = $_POST['nombre'];
-                $usuario = $_POST['usuario'];
-                $password = $_POST['password'];
-                $correo = $_POST['correo'];
-                $comision = $_POST['comision'];
-                
-                if ($userModel->createBarbero($nombre, $usuario, $password, $correo, $comision)) {
-                    $data['success'] = 'Barbero creado exitosamente';
-                } else {
-                    $data['error'] = 'Error al crear barbero';
-                }
+        if ($action === 'create_barbero') {
+            $nombre = $_POST['nombre'];
+            $usuario = $_POST['usuario'];
+            $password = $_POST['password'];
+            $correo = $_POST['correo'];
+            $comision = $_POST['comision'];
+
+            if ($userModel->createBarbero($nombre, $usuario, $password, $correo, $comision)) {
+                $data['success'] = 'Barbero creado exitosamente.';
+            } else {
+                $data['error'] = 'Error al crear barbero.';
             }
         }
-        
-        $data['barberos'] = $userModel->getByRole('barbero');
-        $data['clientes'] = $userModel->getByRole('cliente');
-        
-        $this->view('admin/usuarios', $data ?? []);
+
+        elseif ($action === 'edit_barbero') {
+            $id = $_POST['id'];
+            $nombre = $_POST['nombre'];
+            $usuario = $_POST['usuario'];
+            $correo = $_POST['correo'];
+            $comision = $_POST['comision'];
+
+            if ($userModel->actualizarBarbero($id, $nombre, $usuario, $correo, $comision)) {
+                $data['success'] = 'Barbero actualizado correctamente.';
+            } else {
+                $data['error'] = 'Error al actualizar barbero.';
+            }
+        }
+
+        elseif ($action === 'delete_barbero') {
+            $id = $_POST['id'];
+
+            if ($userModel->desactivarBarbero($id)) {
+                $data['success'] = 'Barbero eliminado (inactivado) correctamente.';
+            } else {
+                $data['error'] = 'Error al eliminar barbero.';
+            }
+        }
     }
+
+    $data['barberos'] = $userModel->getByRole('barbero');
+    $data['clientes'] = $userModel->getByRole('cliente');
+
+    $this->view('admin/usuarios', $data ?? []);
+}
+
     
     public function servicios() {
         $servicioModel = $this->model('Servicio');

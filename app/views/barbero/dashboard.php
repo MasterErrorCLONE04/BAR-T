@@ -7,19 +7,7 @@ include '../app/views/includes/navbar.php';
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-2 sidebar p-0">
-            <div class="nav flex-column nav-pills p-3">
-                <a class="nav-link active" href="<?= BASE_URL ?>index.php?url=barbero/dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=barbero/citas">
-                    <i class="fas fa-calendar"></i> Mis Citas
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=barbero/comisiones">
-                    <i class="fas fa-money-bill"></i> Comisiones
-                </a>
-            </div>
-        </div>
+        <?php include '../app/views/includes/sidebar.php'; ?>
         
         <!-- Main Content -->
         <div class="col-md-10 p-4">

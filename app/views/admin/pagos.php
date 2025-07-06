@@ -7,28 +7,8 @@ include '../app/views/includes/navbar.php';
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-2 sidebar p-0">
-            <div class="nav flex-column nav-pills p-3">
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=admin/dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=admin/usuarios">
-                    <i class="fas fa-users"></i> Usuarios
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=admin/servicios">
-                    <i class="fas fa-cut"></i> Servicios
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=admin/citas">
-                    <i class="fas fa-calendar"></i> Citas
-                </a>
-                <a class="nav-link" href="<?= BASE_URL ?>index.php?url=admin/comisiones">
-                    <i class="fas fa-money-bill"></i> Comisiones
-                </a>
-                <a class="nav-link active" href="<?= BASE_URL ?>index.php?url=admin/pagos">
-                    <i class="fas fa-credit-card"></i> Pagos
-                </a>
-            </div>
-        </div>
+        <?php include '../app/views/includes/sidebar.php'; ?>
+
         
         <!-- Main Content -->
         <div class="col-md-10 p-4">
