@@ -89,4 +89,10 @@ class Usuario extends Model {
         $sql = "SELECT * FROM usuarios WHERE rol = 'admin' AND activo = 1 LIMIT 1";
         return $this->fetch($sql);
     }
+
+    public function desactivarBarbero($id) {
+    $sql = "UPDATE usuarios SET activo = 0 WHERE id = ? AND rol = 'barbero'";
+    return $this->execute($sql, [$id]);
+    }
+
 }

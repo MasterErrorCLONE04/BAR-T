@@ -5,12 +5,12 @@ include '../app/views/includes/navbar.php';
 ?>
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="d-flex">
         <!-- Sidebar -->
         <?php include '../app/views/includes/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <div class="col-md-10 p-4">
+        <div class="main-content flex-grow-1 bg-light p-4 transition-all" id="mainContent">
             <h2 class="mb-4">Mis Comisiones</h2>
             
             <!-- Resumen -->

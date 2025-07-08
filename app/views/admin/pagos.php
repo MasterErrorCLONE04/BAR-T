@@ -4,30 +4,29 @@ include '../app/views/includes/header.php';
 include '../app/views/includes/navbar.php';
 ?>
 
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid d-flex flex-column" style="min-height: 100vh;">
+    <div class="d-flex flex-grow-1">
         <!-- Sidebar -->
         <?php include '../app/views/includes/sidebar.php'; ?>
 
-        
         <!-- Main Content -->
-        <div class="col-md-10 p-4">
+        <div class="main-content flex-grow-1 bg-light p-4 d-flex flex-column">
             <h2 class="mb-4">Gestión de Pagos</h2>
-            
+
             <?php if (isset($success)): ?>
                 <div class="alert alert-success alert-dismissible fade show">
                     <i class="fas fa-check-circle"></i> <?= $success ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-            
+
             <?php if (isset($error)): ?>
                 <div class="alert alert-danger alert-dismissible fade show">
                     <i class="fas fa-exclamation-circle"></i> <?= $error ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-            
+
             <!-- Comisiones Pendientes -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -55,7 +54,7 @@ include '../app/views/includes/navbar.php';
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="barbero_id" value="<?= $pendiente['barbero_id'] ?>">
                                                 <button type="submit" class="btn btn-success btn-sm"
-                                                        onclick="return confirmarAccion('¿Confirmar pago de $<?= number_format($pendiente['total_monto'], 2) ?> a <?= htmlspecialchars($pendiente['barbero_nombre']) ?>?')">
+                                                    onclick="return confirmarAccion('¿Confirmar pago de $<?= number_format($pendiente['total_monto'], 2) ?> a <?= htmlspecialchars($pendiente['barbero_nombre']) ?>?')">
                                                     <i class="fas fa-credit-card"></i> Pagar $<?= number_format($pendiente['total_monto'], 2) ?>
                                                 </button>
                                             </form>
@@ -72,9 +71,9 @@ include '../app/views/includes/navbar.php';
                     <?php endif; ?>
                 </div>
             </div>
-            
+
             <!-- Historial de Pagos -->
-            <div class="card">
+            <div class="card flex-grow-1">
                 <div class="card-header">
                     <h5>Historial de Pagos</h5>
                 </div>
@@ -111,8 +110,25 @@ include '../app/views/includes/navbar.php';
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+        </div> <!-- Fin Main Content -->
+    </div> <!-- Fin Row -->
+</div> <!-- Fin Container -->
+
+<script>
+function confirmarAccion(mensaje) {
+    return confirm(mensaje);
+}
+</script>
+
+<style>
+.sidebar {
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+}
+.main-content {
+    min-height: 100vh;
+}
+</style>
 
 <?php include '../app/views/includes/footer.php'; ?>

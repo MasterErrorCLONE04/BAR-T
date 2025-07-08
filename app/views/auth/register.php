@@ -580,13 +580,6 @@
         <div class="col-lg-6 register-section">
             <div class="register-container">
                 <div class="register-card">
-                    <div class="progress-steps">
-                        <div class="step active"></div>
-                        <div class="step"></div>
-                        <div class="step"></div>
-                        <div class="step"></div>
-                    </div>
-                    
                     <h2 class="register-title">Crear Cuenta</h2>
                     
                     <?php if (isset($error)): ?>

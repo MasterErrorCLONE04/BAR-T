@@ -155,20 +155,17 @@ $rol = SessionHelper::getUserRole();
 
 <script>
     function toggleSidebar() {
-        const sidebar = document.getElementById('mainSidebar');
-        const toggleIcon = document.getElementById('toggleIcon');
-        
-        sidebar.classList.toggle('sidebar-collapsed');
-        
-        // Cambiar icono
-        if (sidebar.classList.contains('sidebar-collapsed')) {
-            toggleIcon.classList.remove('fa-chevron-left');
-            toggleIcon.classList.add('fa-chevron-right');
-        } else {
-            toggleIcon.classList.remove('fa-chevron-right');
-            toggleIcon.classList.add('fa-chevron-left');
-        }
-    }
+    const sidebar = document.getElementById('mainSidebar');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const mainContent = document.getElementById('mainContent');
+
+    sidebar.classList.toggle('sidebar-collapsed');
+    mainContent.classList.toggle('content-expanded');
+
+    toggleIcon.classList.toggle('fa-chevron-left');
+    toggleIcon.classList.toggle('fa-chevron-right');
+}
+
 </script>
 
 <?php if (in_array($rol, ['admin', 'cliente', 'barbero'])): ?>

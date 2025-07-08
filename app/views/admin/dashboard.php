@@ -4,13 +4,14 @@ include '../app/views/includes/header.php';
 include '../app/views/includes/navbar.php';
 ?>
 
-<div class="container-fluid admin-dashboard">
-    <div class="row g-0">
+<div class="container-fluid admin-dashboard d-flex flex-column" style="min-height: 100vh;">
+    <div class="d-flex flex-grow-1">
         <!-- Sidebar -->
-         <?php include '../app/views/includes/sidebar.php'; ?>
+        <?php include '../app/views/includes/sidebar.php'; ?>
+        
         <!-- Main Content -->
-        <div class="col-lg-10 main-content bg-light">
-            <div class="p-4">
+        <div class="main-content flex-grow-1 bg-light p-4 transition-all d-flex flex-column" id="mainContent">
+            <div class="p-4 flex-grow-1 d-flex flex-column">
                 <!-- Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="mb-0"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard Administrativo</h2>
@@ -267,11 +268,23 @@ include '../app/views/includes/navbar.php';
         position: sticky;
         top: 0;
     }
-    
+
     .main-content {
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
-    
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
     .icon-circle {
         width: 60px;
         height: 60px;
@@ -279,39 +292,6 @@ include '../app/views/includes/navbar.php';
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    
-    .bg-purple {
-        background-color: #6f42c1 !important;
-    }
-    
-    .bg-teal {
-        background-color: #20c997 !important;
-    }
-    
-    .nav-pills .nav-link.active {
-        background-color: #0d6efd;
-        font-weight: 500;
-    }
-    
-    .nav-pills .nav-link {
-        color: #adb5bd;
-        transition: all 0.3s;
-    }
-    
-    .nav-pills .nav-link:hover {
-        color: white;
-        background-color: rgba(255,255,255,0.1);
-    }
-    
-    .card {
-        border: none;
-        border-radius: 10px;
-        transition: transform 0.2s;
-    }
-    
-    .card:hover {
-        transform: translateY(-2px);
     }
 </style>
 
